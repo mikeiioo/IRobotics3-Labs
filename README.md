@@ -1,2 +1,2 @@
 # Robotics-Lab-03
-CS1301 at Georgia Tech's Robotics Lab 
+This is our Robotics lab for Dr.Borela's CS1301 class 
