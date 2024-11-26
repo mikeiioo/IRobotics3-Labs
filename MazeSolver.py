@@ -234,34 +234,19 @@ async def navigateMaze(robot):
 #_________________(THE MAIN)_________________________________________________________
 
         orientation = getRobotOrientation(pos.heading)
-        print(f"This is orientation: {orientation}")
         
         potentialNeighbors = getPotentialNeighbors(CURR_CELL, orientation)
-        print(f"This is pN: {potentialNeighbors}")
 
         wallsAroundCell = getWallConfiguration(IR[0], IR[3], IR[6], WALL_THRESHOLD)
-        print(f"This is waAc:{wallsAroundCell}")
-
 
         navNeighbors = getNavigableNeighbors(wallsAroundCell, potentialNeighbors, PREV_CELL, N_X_CELLS, N_Y_CELLS)
-        print(f"This is NN {navNeighbors}")
-        print(f"Current Cell: {CURR_CELL}")
-
 
         MAZE_DICT = updateMazeNeighbors(MAZE_DICT, CURR_CELL, navNeighbors)
-        print(f"{MAZE_DICT}")
-
 
         MAZE_DICT = updateMazeCost(MAZE_DICT, START, DESTINATION)
-        print(f"{MAZE_DICT}")
-        
-
 
         nextCell = getNextCell(MAZE_DICT, CURR_CELL)
-        print(f"Start: {nextCell}")
-
         
-
         await navigateToNextCell(robot, nextCell, orientation)
 #_____________________________________________________________________________________
         
