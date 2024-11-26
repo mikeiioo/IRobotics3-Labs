@@ -113,7 +113,10 @@ def getWallConfiguration(IR0, IR3, IR6, threshold):
     return wList
 
 def getNavigableNeighbors(wallsAroundCell, potentialNeighbors, prevCell, nXCells, nYCells):
-    nList = [prevCell]
+    if not prevCell == None:
+        nList = [prevCell]
+    else:
+        nList = []
     for t, b in enumerate(wallsAroundCell):
         if not b and isValidCell(potentialNeighbors[t], nXCells, nYCells):
             nList.append(potentialNeighbors[t])
@@ -123,8 +126,9 @@ def updateMazeNeighbors(mazeDict, currentCell, navNeighbors):
     for cell, cellDict in mazeDict.items():
         if currentCell in cellDict["neighbors"]:
             if cell not in navNeighbors:
-                del cellDict["neighbors"][currentCell]           
-    mazeDict[currentCell]["neighbors"] = navNeighbors
+                index = cellDict["neighbors"].index(currentCell)
+                del cellDict["neighbors"][index]
+    mazeDict[currentCell]["neighbors"] = navNeighbors 
     return mazeDict
 
 def getNextCell(mazeDict, currentCell):
@@ -180,7 +184,6 @@ MAZE_DICT = createMazeDict(N_X_CELLS, N_Y_CELLS, CELL_DIM)
 MAZE_DICT = addAllNeighbors(MAZE_DICT, N_X_CELLS, N_Y_CELLS)
 
 
-
 # ==========================================================
 # EXPLORATION AND NAVIGATION
 
@@ -225,6 +228,7 @@ async def navigateMaze(robot):
         if checkCellArrived(CURR_CELL, DESTINATION):
             await robot.set_wheel_speeds(0,0)
             await robot.set_lights_spin_rgb(0, 255, 0)
+            
             break
 
 #_________________(THE MAIN)_________________________________________________________
@@ -243,7 +247,7 @@ async def navigateMaze(robot):
 
         nextCell = getNextCell(MAZE_DICT, CURR_CELL)
 
-        navigateToNextCell(robot, nextCell, orientation)
+        await navigateToNextCell(robot, nextCell, orientation)
 #_____________________________________________________________________________________
         
         if HAS_COLLIDED == True:
@@ -252,17 +256,3 @@ async def navigateMaze(robot):
         
 
 robot.play()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
