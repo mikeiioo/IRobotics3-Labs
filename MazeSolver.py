@@ -4,7 +4,7 @@ from irobot_edu_sdk.music import Note
 from collections import deque
 
 # robot is the instance of the robot that will allow us to call its methods and to define events with the @event decorator.
-robot = Create3(Bluetooth())  # Will connect to the first robot found.
+robot = Create3(Bluetooth("AVINASH-BOT"))  # Will connect to the first robot found.
 
 # === FLAG VARIABLES
 HAS_COLLIDED = False
@@ -18,9 +18,9 @@ CELL_DIM = 50
 
 # === DEFINING ORIGIN AND DESTINATION
 PREV_CELL = None
-START = (0,1)
+START = (0,0)
 CURR_CELL = START
-DESTINATION = (1,0)
+DESTINATION = (2,2)
 '''
 MAZE_DICT[CURR_CELL]["visited"] = True
 '''
@@ -127,8 +127,8 @@ def updateMazeNeighbors(mazeDict, currentCell, navNeighbors):
         if currentCell in cellDict["neighbors"]:
             if cell not in navNeighbors:
                 index = cellDict["neighbors"].index(currentCell)
-                del cellDict["neighbors"][index]
-    mazeDict[currentCell]["neighbors"] = navNeighbors 
+                del cellDict["neighbors"][index]           
+    mazeDict[currentCell]["neighbors"] = navNeighbors
     return mazeDict
 
 def getNextCell(mazeDict, currentCell):
@@ -184,6 +184,7 @@ MAZE_DICT = createMazeDict(N_X_CELLS, N_Y_CELLS, CELL_DIM)
 MAZE_DICT = addAllNeighbors(MAZE_DICT, N_X_CELLS, N_Y_CELLS)
 
 
+
 # ==========================================================
 # EXPLORATION AND NAVIGATION
 
@@ -228,24 +229,38 @@ async def navigateMaze(robot):
         if checkCellArrived(CURR_CELL, DESTINATION):
             await robot.set_wheel_speeds(0,0)
             await robot.set_lights_spin_rgb(0, 255, 0)
-            
             break
 
 #_________________(THE MAIN)_________________________________________________________
 
         orientation = getRobotOrientation(pos.heading)
+        print(f"This is orientation: {orientation}")
         
         potentialNeighbors = getPotentialNeighbors(CURR_CELL, orientation)
+        print(f"This is pN: {potentialNeighbors}")
 
         wallsAroundCell = getWallConfiguration(IR[0], IR[3], IR[6], WALL_THRESHOLD)
+        print(f"This is waAc:{wallsAroundCell}")
+
 
         navNeighbors = getNavigableNeighbors(wallsAroundCell, potentialNeighbors, PREV_CELL, N_X_CELLS, N_Y_CELLS)
+        print(f"This is NN {navNeighbors}")
+        print(f"Current Cell: {CURR_CELL}")
+
 
         MAZE_DICT = updateMazeNeighbors(MAZE_DICT, CURR_CELL, navNeighbors)
+        print(f"{MAZE_DICT}")
+
 
         MAZE_DICT = updateMazeCost(MAZE_DICT, START, DESTINATION)
+        print(f"{MAZE_DICT}")
+        
+
 
         nextCell = getNextCell(MAZE_DICT, CURR_CELL)
+        print(f"Start: {nextCell}")
+
+        
 
         await navigateToNextCell(robot, nextCell, orientation)
 #_____________________________________________________________________________________
@@ -256,3 +271,4 @@ async def navigateMaze(robot):
         
 
 robot.play()
+
